@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fondo oscuro siempre */
+body {
+  @apply bg-darkBackground text-lightText;
+}

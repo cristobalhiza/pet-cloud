@@ -1,0 +1,124 @@
+├── .next
+    ├── cache
+        ├── .rscinfo
+    ├── server
+        ├── app
+            ├── _not-found
+                ├── page
+                    ├── app-build-manifest.json
+                    ├── app-paths-manifest.json
+                    ├── build-manifest.json
+                    ├── next-font-manifest.json
+                    ├── react-loadable-manifest.json
+                    ├── server-reference-manifest.json
+                ├── page_client-reference-manifest.js
+                ├── page.js
+                ├── page.js.map
+            ├── favicon.ico
+                ├── route
+                    ├── app-paths-manifest.json
+                    ├── next-font-manifest.json
+                    ├── react-loadable-manifest.json
+                ├── route.js
+                ├── route.js.map
+            ├── page
+                ├── app-build-manifest.json
+                ├── app-paths-manifest.json
+                ├── build-manifest.json
+                ├── next-font-manifest.json
+                ├── react-loadable-manifest.json
+                ├── server-reference-manifest.json
+            ├── page_client-reference-manifest.js
+            ├── page.js
+            ├── page.js.map
+        ├── pages
+            ├── _app
+                ├── build-manifest.json
+                ├── next-font-manifest.json
+                ├── pages-manifest.json
+                ├── react-loadable-manifest.json
+            ├── _document
+                ├── next-font-manifest.json
+                ├── pages-manifest.json
+                ├── react-loadable-manifest.json
+            ├── _error
+                ├── build-manifest.json
+                ├── next-font-manifest.json
+                ├── pages-manifest.json
+                ├── react-loadable-manifest.json
+            ├── _app.js
+            ├── _app.js.map
+            ├── _document.js
+            ├── _document.js.map
+            ├── _error.js
+            ├── _error.js.map
+        ├── app-paths-manifest.json
+        ├── interception-route-rewrite-manifest.js
+        ├── middleware-build-manifest.js
+        ├── middleware-manifest.json
+        ├── middleware-react-loadable-manifest.js
+        ├── next-font-manifest.js
+        ├── next-font-manifest.json
+        ├── pages-manifest.json
+        ├── server-reference-manifest.js
+        ├── server-reference-manifest.json
+    ├── static
+        ├── development
+            ├── _buildManifest.js
+            ├── _clientMiddlewareManifest.json
+            ├── _ssgManifest.js
+        ├── media
+            ├── favicon.45db1c09.ico
+            ├── gyByhwUxId8gMEwcGFWNOITd-s.p.da1ebef7.woff2
+            ├── gyByhwUxId8gMEwSGFWNOITddY4-s.81df3a5b.woff2
+            ├── or3nQ6H_1_WfwkMZI_qYFrcdmhHkjko-s.p.be19f591.woff2
+            ├── or3nQ6H_1_WfwkMZI_qYFrkdmhHkjkotbA-s.e32db976.woff2
+    ├── types
+    ├── app-build-manifest.json
+    ├── build-manifest.json
+    ├── fallback-build-manifest.json
+    ├── package.json
+    ├── react-loadable-manifest.json
+    ├── trace
+    ├── transform.js
+    ├── transform.js.map
+├── public
+    ├── file.svg
+    ├── globe.svg
+    ├── next.svg
+    ├── vercel.svg
+    ├── window.svg
+├── src
+    ├── app
+        ├── add
+            ├── page.tsx
+        ├── favicon.ico
+        ├── globals.css
+        ├── layout.tsx
+        ├── page.tsx
+    ├── components
+        ├── EventList.tsx
+    ├── hooks
+        ├── useFetchEvents.ts
+    ├── services
+        ├── repository
+            ├── database.ts
+            ├── firestoreDatabase.ts
+        ├── firebase.ts
+    ├── store
+        ├── eventStore.ts
+    ├── types
+        ├── event.ts
+├── .env.local
+├── .gitignore
+├── eslint.config.mjs
+├── next-env.d.ts
+├── next.config.ts
+├── package.json
+├── pnpm-lock.yaml
+├── postcss.config.mjs
+├── PROJECT_STRUCTURE.txt
+├── README.md
+├── tailwind.config.ts
+├── tsconfig.json
+├── tsconfig.tsbuildinfo
