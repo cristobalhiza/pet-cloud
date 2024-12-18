@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { Pet } from "@/types/pet";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const db = new FirestoreDatabase<Pet>("pet");
 
@@ -28,10 +30,11 @@ export default function ProfileForm({
     setSaving(true);
     try {
       await db.update("profile", profile);
-      alert("Perfil actualizado correctamente.");
+      toast.success("Perfil actualizado correctamente."); // Reemplazo de alert
       onSuccess();
     } catch (error) {
       console.error("Error al guardar el perfil:", error);
+      toast.error("Error al guardar el perfil");
     } finally {
       setSaving(false);
     }
@@ -40,7 +43,6 @@ export default function ProfileForm({
   return (
     <div className="p-6 bg-darkCard rounded">
       <h1 className="text-2xl font-bold mb-4 text-accentPurple">Editar Perfil de la Perrita</h1>
-
       <input
         type="text"
         name="name"
@@ -58,8 +60,8 @@ export default function ProfileForm({
       />
       <input
         type="text"
-        name="breed" 
-        placeholder="Especie"
+        name="breed"
+        placeholder="Raza"
         value={profile.breed || ""}
         onChange={handleChange}
         className="w-full p-2 mb-4 border rounded bg-gray-800 text-white"
@@ -76,6 +78,14 @@ export default function ProfileForm({
         name="description"
         placeholder="Descripción"
         value={profile.description || ""}
+        onChange={handleChange}
+        className="w-full p-2 mb-4 border rounded bg-gray-800 text-white"
+      />
+      <input
+        type="text"
+        name="photo"
+        placeholder="URL de la Foto"
+        value={profile.photo || ""}
         onChange={handleChange}
         className="w-full p-2 mb-4 border rounded bg-gray-800 text-white"
       />

@@ -1,11 +1,9 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import EventList from "@/components/EventList";
 import ProfileCard from "@/components/ProfileCard";
 import Link from "next/link";
 import FirestoreDatabase from "@/services/repository/firestoreDatabase";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 interface Pet {
@@ -31,26 +29,35 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="p-6 min-h-screen">
-      <ToastContainer />
-      <h1 className="text-4xl font-bold text-accentPurple mb-6">
-        Rincón de {profileName || "la mascota"} 🐾
-      </h1>
+    <>
+      <div className="p-6 min-h-screen bg-gray-900 text-white">
+        <h1 className="text-4xl md:text-5xl font-bold text-center text-accentPurple mb-8">
+          Rincón de {profileName || "la mascota"} 🐾
+        </h1>
 
-      <div className="bg-darkCard p-4 rounded mb-6">
-        <h2 className="text-2xl font-bold text-white mb-4">Perfil de la Perrita</h2>
-        <ProfileCard />
-      </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Perfil de la Perrita */}
+          <div className="bg-darkCard p-6 rounded shadow-lg">
+            <h2 className="text-2xl font-bold mb-4 text-white text-center">
+              INFORMACIÓN
+            </h2>
+            <ProfileCard />
+          </div>
 
-      <div className="bg-darkCard p-4 rounded">
-        <h2 className="text-2xl font-bold text-white mb-4">Calendario de Eventos</h2>
-        <EventList />
-        <Link href="/add">
-          <button className="mt-4 bg-accentPurple text-white p-2 rounded">
-            + Agregar Evento
-          </button>
-        </Link>
+          {/* Calendario de Eventos */}
+          <div className="bg-darkCard p-6 rounded shadow-lg">
+            <h2 className="text-2xl font-bold mb-4 text-white">
+              VACUNAS Y EVENTOS IMPORTANTES
+            </h2>
+            <EventList />
+            <Link href="/add">
+              <button className="mt-4 bg-accentPurple text-white p-2 rounded hover:bg-purple-700 w-full">
+                + Agregar Evento
+              </button>
+            </Link>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

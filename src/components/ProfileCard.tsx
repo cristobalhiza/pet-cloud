@@ -11,7 +11,6 @@ export default function ProfileCard() {
   const [profile, setProfile] = useState<Pet | null>(null);
   const [editing, setEditing] = useState(false);
 
-  // Función para cargar el perfil desde la base de datos
   const fetchProfile = async () => {
     try {
       const data = await db.getOne("profile");
@@ -39,13 +38,20 @@ export default function ProfileCard() {
       initialData={profile}
       onSuccess={() => {
         setEditing(false);
-        fetchProfile(); // Recargar el perfil después de guardar
+        fetchProfile();
       }}
     />
   ) : (
     <div className="text-white">
       {profile ? (
         <>
+          {profile.photo && (
+            <img
+              src={profile.photo}
+              alt="Foto de la perrita"
+              className="w-52 mx-auto object-cover rounded-lg mb-4"
+            />
+          )}
           <p><strong>Edad:</strong> {calculateAge(profile.birthDate)}</p>
           <p><strong>Peso:</strong> {profile.weight} kg</p>
           <p><strong>Raza:</strong> {profile.breed}</p>
