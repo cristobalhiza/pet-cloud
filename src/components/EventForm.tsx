@@ -1,90 +1,117 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import FirestoreDatabase from "@/services/repository/firestoreDatabase";
+import { Event } from "@/types/event";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
-const db = new FirestoreDatabase("events");
+const db = new FirestoreDatabase<Event>("events");
 
 export default function EventForm({
   initialData,
+  petId,
   onSuccess,
 }: {
-  initialData?: { title: string; date: string; intervalDays?: number; description?: string };
-  onSuccess?: () => void;
+  initialData: Partial<Event> | null;
+  petId: string;
+  onSuccess: () => Promise<void>;
 }) {
-  const [title, setTitle] = useState(initialData?.title || "");
-  const [date, setDate] = useState(initialData?.date || "");
-  const [intervalDays, setIntervalDays] = useState<number | "">(initialData?.intervalDays || "");
-  const [description, setDescription] = useState(initialData?.description || "");
+  const [eventData, setEventData] = useState<Partial<Event>>(initialData || {});
   const [saving, setSaving] = useState(false);
-  const router = useRouter();
 
-  const calculateFinalDate = () => {
-    if (!date || intervalDays === "" || intervalDays === 0) return null;
-    const startDate = new Date(date);
-    startDate.setDate(startDate.getDate() + intervalDays);
-    return startDate.toISOString().split("T")[0];
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEventData((prev) => ({
+      ...prev,
+      [name]: name === "daysInterval" ? parseInt(value) || 0 : value,
+    }));
+  };
+
+  const calculateFinalDate = (date: string, daysInterval?: number): string | undefined => {
+    if (!date || !daysInterval) return undefined;
+    const initialDate = new Date(date);
+    initialDate.setDate(initialDate.getDate() + daysInterval);
+    return initialDate.toISOString().split("T")[0]; // Retorna en formato "YYYY-MM-DD"
   };
 
   const handleSave = async () => {
+    if (!petId) {
+      toast.error("No se puede guardar el evento sin una mascota seleccionada.");
+      return;
+    }
+
+    const { title, date, description, daysInterval } = eventData;
+
+    if (!title || !date) {
+      toast.error("Los campos 'Título' y 'Fecha' son obligatorios.");
+      return;
+    }
+
     setSaving(true);
     try {
-      const finalDate = calculateFinalDate();
-      await db.add({
+      const finalDate = calculateFinalDate(date, daysInterval);
+
+      const eventToAdd: Omit<Event, "id"> = {
+        petId,
         title,
         date,
-        finalDate: finalDate || null, // Fecha final puede ser null
-        intervalDays: intervalDays || 0,
-        description,
-      });
-      toast.success("Evento guardado correctamente");
-      router.push("/"); // Redirige a la página principal
+        description: description || "",
+        daysInterval: daysInterval || 0,
+        finalDate: finalDate || "",
+      };
+
+      await db.add(eventToAdd);
+      toast.success("Evento guardado correctamente.");
+      await onSuccess();
     } catch (error) {
       console.error("Error al guardar el evento:", error);
-      toast.error("Error al guardar el evento");
+      toast.error("Error al guardar el evento.");
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <div className="p-6 bg-darkCard rounded">
-      <h1 className="text-2xl font-bold text-accentPurple mb-4">
-        {initialData ? "Editar Evento" : "Agregar Evento"}
-      </h1>
+    <div className="space-y-4">
       <input
         type="text"
-        placeholder="Título del evento"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="w-full p-2 mb-4 border rounded bg-gray-800 text-white"
+        name="title"
+        placeholder="Título del Evento"
+        value={eventData.title || ""}
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg bg-gray-700 text-white placeholder-gray-400"
       />
       <input
         type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        className="w-full p-2 mb-4 border rounded bg-gray-800 text-white"
+        name="date"
+        value={eventData.date || ""}
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg bg-gray-700 text-white placeholder-gray-400"
       />
       <input
         type="number"
-        placeholder="Intervalo de días (0 si no aplica)"
-        value={intervalDays}
-        onChange={(e) => setIntervalDays(Number(e.target.value))}
-        className="w-full p-2 mb-4 border rounded bg-gray-800 text-white"
+        name="daysInterval"
+        placeholder="Días de Duración"
+        value={eventData.daysInterval || ""}
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg bg-gray-700 text-white placeholder-gray-400"
       />
       <textarea
+        name="description"
         placeholder="Descripción"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        className="w-full p-2 mb-4 border rounded bg-gray-800 text-white"
-      ></textarea>
+        value={eventData.description || ""}
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg bg-gray-700 text-white placeholder-gray-400 resize-none"
+        rows={4}
+      />
       <button
         onClick={handleSave}
         disabled={saving}
-        className="w-full bg-accentPurple text-white p-2 rounded hover:bg-purple-700"
+        className={`w-full p-3 rounded-lg text-white font-semibold transition ${
+          saving
+            ? "bg-gray-500 cursor-not-allowed"
+            : "bg-accentPurple hover:bg-purple-700"
+        }`}
       >
         {saving ? "Guardando..." : "Guardar Evento"}
       </button>

@@ -6,14 +6,14 @@ import { Event } from "@/types/event";
 
 const db = new FirestoreDatabase<Event>("events");
 
-export function useFetchEvents() {
+export function useFetchEvents(petId: string) {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const data = await db.getAll();
+      const data = await db.getByPetId(petId); // Usa el método getByPetId
       setEvents(data);
     } catch (error) {
       console.error("Error al obtener eventos:", error);
@@ -23,8 +23,12 @@ export function useFetchEvents() {
   };
 
   useEffect(() => {
-    fetchEvents();
-  }, []);
+    if (petId) {
+      fetchEvents();
+    }
+  }, [petId]);
 
-  return { events, loading, refetch: fetchEvents }; // Retorna la función refetch
+  return { events, loading, refetch: fetchEvents };
 }
+
+

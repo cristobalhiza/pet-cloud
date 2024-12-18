@@ -1,5 +1,5 @@
 export interface Pet {
-    id?: string; // Opcional si lo usamos para Firestore
+    id: string; // Opcional si lo usamos para Firestore
     name: string;
     birthDate: string; // Formato de fecha: "YYYY-MM-DD"
     specie: string; // Ejemplo: "Perro", "Gato", etc.
