@@ -1,6 +1,7 @@
 import {
   collection,
   addDoc,
+  getDoc,
   getDocs,
   doc,
   updateDoc,
@@ -23,7 +24,7 @@ export default class FirestoreDatabase<T> {
     return querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    })) as T[]; // Aseguramos que el tipo sea T[]
+    })) as T[];
   }
 
   // Agregar un nuevo documento
@@ -42,4 +43,10 @@ export default class FirestoreDatabase<T> {
     const docRef = doc(db, this.collectionName, id);
     await deleteDoc(docRef);
   }
+  async getOne(id: string): Promise<T | null> {
+    const docRef = doc(db, this.collectionName, id);
+    const snapshot = await getDoc(docRef);
+    return snapshot.exists() ? ({ id: snapshot.id, ...snapshot.data() } as T) : null;
+  }
+  
 }

@@ -1,57 +1,92 @@
 "use client";
-import { useState } from "react";
-import FirestoreDatabase from "@/services/repository/firestoreDatabase";
-import { useEventStore } from "@/store/eventStore";
-import { Event } from "@/types/event";
 
-// Instancia de FirestoreDatabase
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import FirestoreDatabase from "@/services/repository/firestoreDatabase";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const db = new FirestoreDatabase("events");
 
 export default function EventForm({
   initialData,
   onSuccess,
 }: {
-  initialData?: Event;
+  initialData?: { title: string; date: string; intervalDays?: number; description?: string };
   onSuccess?: () => void;
 }) {
-  const { fetchEvents } = useEventStore();
-  const [name, setName] = useState(initialData?.name || "");
+  const [title, setTitle] = useState(initialData?.title || "");
   const [date, setDate] = useState(initialData?.date || "");
+  const [intervalDays, setIntervalDays] = useState<number | "">(initialData?.intervalDays || "");
+  const [description, setDescription] = useState(initialData?.description || "");
+  const [saving, setSaving] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = async () => {
+  const calculateFinalDate = () => {
+    if (!date || intervalDays === "" || intervalDays === 0) return null;
+    const startDate = new Date(date);
+    startDate.setDate(startDate.getDate() + intervalDays);
+    return startDate.toISOString().split("T")[0];
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
     try {
-      if (initialData?.id) {
-        await db.update(initialData.id, { name, date });
-      } else {
-        await db.add({ name, date });
-      }
-      await fetchEvents(); // Refresca los eventos
-      if (onSuccess) onSuccess();
+      const finalDate = calculateFinalDate();
+      await db.add({
+        title,
+        date,
+        finalDate: finalDate || null, // Fecha final puede ser null
+        intervalDays: intervalDays || 0,
+        description,
+      });
+      toast.success("Evento guardado correctamente");
+      router.push("/"); // Redirige a la página principal
     } catch (error) {
       console.error("Error al guardar el evento:", error);
+      toast.error("Error al guardar el evento");
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
-    <div className="bg-darkCard p-4 rounded">
+    <div className="p-6 bg-darkCard rounded">
+      <h1 className="text-2xl font-bold text-accentPurple mb-4">
+        {initialData ? "Editar Evento" : "Agregar Evento"}
+      </h1>
       <input
         type="text"
-        placeholder="Nombre del Evento"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="w-full mb-2 p-2 border rounded"
+        placeholder="Título del evento"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="w-full p-2 mb-4 border rounded bg-gray-800 text-white"
       />
       <input
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
-        className="w-full mb-2 p-2 border rounded"
+        className="w-full p-2 mb-4 border rounded bg-gray-800 text-white"
       />
+      <input
+        type="number"
+        placeholder="Intervalo de días (0 si no aplica)"
+        value={intervalDays}
+        onChange={(e) => setIntervalDays(Number(e.target.value))}
+        className="w-full p-2 mb-4 border rounded bg-gray-800 text-white"
+      />
+      <textarea
+        placeholder="Descripción"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        className="w-full p-2 mb-4 border rounded bg-gray-800 text-white"
+      ></textarea>
       <button
-        onClick={handleSubmit}
-        className="bg-accentPurple text-white p-2 rounded w-full"
+        onClick={handleSave}
+        disabled={saving}
+        className="w-full bg-accentPurple text-white p-2 rounded hover:bg-purple-700"
       >
-        {initialData ? "Actualizar" : "Agregar"} Evento
+        {saving ? "Guardando..." : "Guardar Evento"}
       </button>
     </div>
   );

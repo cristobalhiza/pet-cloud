@@ -14,6 +14,17 @@
                 ├── page_client-reference-manifest.js
                 ├── page.js
                 ├── page.js.map
+            ├── add
+                ├── page
+                    ├── app-build-manifest.json
+                    ├── app-paths-manifest.json
+                    ├── build-manifest.json
+                    ├── next-font-manifest.json
+                    ├── react-loadable-manifest.json
+                    ├── server-reference-manifest.json
+                ├── page_client-reference-manifest.js
+                ├── page.js
+                ├── page.js.map
             ├── favicon.ico
                 ├── route
                     ├── app-paths-manifest.json
@@ -28,6 +39,17 @@
                 ├── next-font-manifest.json
                 ├── react-loadable-manifest.json
                 ├── server-reference-manifest.json
+            ├── profile
+                ├── page
+                    ├── app-build-manifest.json
+                    ├── app-paths-manifest.json
+                    ├── build-manifest.json
+                    ├── next-font-manifest.json
+                    ├── react-loadable-manifest.json
+                    ├── server-reference-manifest.json
+                ├── page_client-reference-manifest.js
+                ├── page.js
+                ├── page.js.map
             ├── page_client-reference-manifest.js
             ├── page.js
             ├── page.js.map
@@ -83,21 +105,21 @@
     ├── transform.js
     ├── transform.js.map
 ├── public
-    ├── file.svg
-    ├── globe.svg
-    ├── next.svg
-    ├── vercel.svg
-    ├── window.svg
 ├── src
     ├── app
         ├── add
+            ├── page.tsx
+        ├── profile
             ├── page.tsx
         ├── favicon.ico
         ├── globals.css
         ├── layout.tsx
         ├── page.tsx
     ├── components
+        ├── EventForm.tsx
         ├── EventList.tsx
+        ├── ProfileCard.tsx
+        ├── ProfileForm.tsx
     ├── hooks
         ├── useFetchEvents.ts
     ├── services
@@ -109,9 +131,11 @@
         ├── eventStore.ts
     ├── types
         ├── event.ts
+        ├── pet.ts
 ├── .env.local
 ├── .gitignore
 ├── eslint.config.mjs
+├── LICENSE
 ├── next-env.d.ts
 ├── next.config.ts
 ├── package.json

@@ -1,3 +1,4 @@
+"use client";
 import { create } from "zustand";
 import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { Event } from "@/types/event";

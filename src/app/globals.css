@@ -6,3 +6,8 @@
 body {
   @apply bg-darkBackground text-lightText;
 }
+
+/* global.css */
+input, textarea {
+  @apply bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accentPurple;
+}
