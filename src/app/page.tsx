@@ -7,7 +7,7 @@ import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { toast } from "react-toastify";
 import ProfileForm from "@/components/ProfileForm";
 import { Pet } from "@/types/pet";
-import { FiPlus, FiMinus } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
 import { usePetContext } from "@/context/PetContext";
 
 const db = new FirestoreDatabase<Pet>("pet");
@@ -15,7 +15,7 @@ const db = new FirestoreDatabase<Pet>("pet");
 export default function Home() {
   const [pets, setPets] = useState<Pet[]>([]);
   const { petId, setPetId } = usePetContext();
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchPets = async () => {
@@ -34,30 +34,26 @@ export default function Home() {
 
   const handleAddPet = async (newPet: Partial<Pet>) => {
     try {
-      // Solo intentamos agregar directamente, ya que ProfileForm valida los campos obligatorios
       await db.add(newPet as Omit<Pet, "id">);
-  
       const updatedPets = await db.getAll();
       setPets(updatedPets);
-      setPetId(updatedPets[updatedPets.length - 1].id); // Seleccionar la nueva mascota
-      setShowAddForm(false);
+      setPetId(updatedPets[updatedPets.length - 1].id);
+      setShowModal(false); // Cerrar el modal después de guardar
+      toast.success("Mascota agregada correctamente");
     } catch (error) {
       console.error("Error al agregar mascota:", error);
       toast.error("Error al agregar mascota");
     }
   };
-  
 
-  // Eliminar la mascota seleccionada
   const handleDeletePet = async () => {
     if (!petId) return;
     try {
       await db.delete(petId);
-      toast.success("Mascota eliminada correctamente");
-
       const updatedPets = await db.getAll();
       setPets(updatedPets);
-      setPetId(updatedPets[0]?.id || null); // Seleccionar la primera mascota restante o null
+      setPetId(updatedPets[0]?.id || null);
+      toast.success("Mascota eliminada correctamente");
     } catch (error) {
       console.error("Error al eliminar mascota:", error);
       toast.error("Error al eliminar mascota");
@@ -66,13 +62,12 @@ export default function Home() {
 
   return (
     <div className="p-6 min-h-screen bg-gray-900 text-white">
-      <h1 className="text-4xl md:text-5xl font-bold text-center text-accentPurple mb-8">
-        Guarida de las Mascotas 🐾
-      </h1>
+      <div className="mb-6 w-full flex flex-row">
+        <h1 className="text-4xl md:text-5xl font-bold text-accentPurple flex-1 text-center my-auto">
+          Rincón de Mascotas 🐾
+        </h1>
 
-      <div className="mb-8 flex flex-col lg:flex-row gap-6">
-        {/* Selector de mascotas */}
-        <div className="bg-gray-800 p-4 rounded-lg shadow-md flex-1">
+        <div className="bg-gray-800 p-4 rounded-lg shadow-md flex-2">
           <h2 className="text-xl font-semibold text-accentPurple mb-4">
             Selecciona una Mascota
           </h2>
@@ -95,34 +90,19 @@ export default function Home() {
               Eliminar Mascota
             </button>
           )}
-        </div>
-
-        {/* Formulario para agregar nueva mascota */}
-        <div className="bg-gray-800 p-4 rounded-lg shadow-md flex-1 relative">
-          <h2 className="text-xl font-semibold text-accentPurple flex justify-between items-center">
-            Agregar Nueva Mascota
-            <button
-              onClick={() => setShowAddForm(!showAddForm)}
-              className="text-white bg-accentPurple p-2 rounded-full hover:bg-purple-700 transition"
-            >
-              {showAddForm ? <FiMinus size={20} /> : <FiPlus size={20} />}
-            </button>
-          </h2>
-
-          {showAddForm && (
-            <ProfileForm
-              initialData={null}
-              onSuccess={async (newPet) => await handleAddPet(newPet)}
-            />
-          )}
+          <button
+            onClick={() => setShowModal(true)}
+            className="text-white bg-accentPurple p-2 rounded hover:bg-purple-700 transition ml-2"
+          >
+            Agregar Mascota
+          </button>
         </div>
       </div>
 
-      {/* Perfil de la mascota y eventos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-darkCard p-6 rounded shadow-lg">
           <h2 className="text-2xl font-bold mb-4 text-white text-center">
-            Información
+            Datos Mascota
           </h2>
           {petId && <ProfileCard petId={petId} />}
         </div>
@@ -139,6 +119,26 @@ export default function Home() {
           </Link>
         </div>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full relative">
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-2 right-2 text-white bg-red-600 p-2 rounded-full hover:bg-red-700"
+            >
+              ✕
+            </button>
+            <h2 className="text-2xl font-bold text-accentPurple">
+              Agregar Nueva Mascota
+            </h2>
+            <ProfileForm
+              initialData={null}
+              onSuccess={async (newPet) => await handleAddPet(newPet)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

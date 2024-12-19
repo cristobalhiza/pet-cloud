@@ -70,79 +70,78 @@ export default function ProfileForm({
 
   return (
     <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
-      <h1 className="text-2xl font-bold mb-4 text-accentPurple">
-        Editar Perfil
-      </h1>
-      <input
-        type="text"
-        name="name"
-        placeholder="Nombre *"
-        value={profile.name || ""}
-        onChange={handleChange}
-        className="w-full p-3 mb-4 border rounded bg-gray-700 text-white"
-      />
-      <input
-        type="date"
-        name="birthDate"
-        value={profile.birthDate || ""}
-        onChange={handleChange}
-        className="w-full p-3 mb-4 border rounded bg-gray-700 text-white"
-      />
-      <select
-        name="specie"
-        value={profile.specie || ""}
-        onChange={handleChange}
-        className="w-full p-3 mb-4 border rounded bg-gray-700 text-white"
-      >
-        <option value="" disabled>
-          Selecciona la especie *
-        </option>
-        <option value="Perro">Perro</option>
-        <option value="Gato">Gato</option>
-        <option value="Otro">Otro</option>
-      </select>
-      <input
-        type="text"
-        name="breed"
-        placeholder="Raza"
-        value={profile.breed || ""}
-        onChange={handleChange}
-        className="w-full p-3 mb-4 border rounded bg-gray-700 text-white"
-      />
-      <input
-        type="number"
-        name="weight"
-        placeholder="Peso"
-        value={profile.weight || ""}
-        onChange={handleChange}
-        className="w-full p-3 mb-4 border rounded bg-gray-700 text-white"
-      />
-      <textarea
-        name="description"
-        placeholder="Descripción"
-        value={profile.description || ""}
-        onChange={handleChange}
-        className="w-full p-3 mb-4 border rounded bg-gray-700 text-white resize-none"
-        rows={4}
-      />
-      <input
-        type="text"
-        name="photo"
-        placeholder="URL de la Foto"
-        value={profile.photo || ""}
-        onChange={handleChange}
-        className="w-full p-3 mb-4 border rounded bg-gray-700 text-white"
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4">
+        <input
+          type="text"
+          name="name"
+          placeholder="Nombre *"
+          value={profile.name || ""}
+          onChange={handleChange}
+          className="w-full p-3 border rounded bg-gray-700 text-white"
+        />
+        <input
+          type="date"
+          name="birthDate"
+          value={profile.birthDate || ""}
+          onChange={handleChange}
+          className="w-full p-3 border rounded bg-gray-700 text-white"
+        />
+        <select
+          name="specie"
+          value={profile.specie || ""}
+          onChange={handleChange}
+          className="w-full p-3 border rounded bg-gray-700 text-white"
+        >
+          <option value="" disabled>
+            Selecciona la especie *
+          </option>
+          <option value="Perro">Perro</option>
+          <option value="Gato">Gato</option>
+          <option value="Otro">Otro</option>
+        </select>
+        <input
+          type="text"
+          name="breed"
+          placeholder="Raza"
+          value={profile.breed || ""}
+          onChange={handleChange}
+          className="w-full p-3 border rounded bg-gray-700 text-white"
+        />
+        <input
+          type="number"
+          name="weight"
+          placeholder="Peso"
+          value={profile.weight || ""}
+          onChange={handleChange}
+          className="w-full p-3 border rounded bg-gray-700 text-white"
+        />
+        <input
+          type="text"
+          name="photo"
+          placeholder="URL de la Foto"
+          value={profile.photo || ""}
+          onChange={handleChange}
+          className="w-full p-3 border rounded bg-gray-700 text-white"
+        />
+        <textarea
+          name="description"
+          placeholder="Descripción"
+          value={profile.description || ""}
+          onChange={handleChange}
+          className="w-full p-3 border rounded bg-gray-700 text-white resize-none md:col-span-2"
+          rows={4}
+        />
+      </div>
       <button
         onClick={handleSave}
         disabled={saving}
-        className={`w-full p-3 rounded-lg text-white font-semibold ${
+        className={`mt-6 w-full p-3 rounded-lg text-white font-semibold ${
           saving
             ? "bg-gray-500 cursor-not-allowed"
             : "bg-accentPurple hover:bg-purple-700"
         }`}
       >
-        {saving ? "Guardando..." : "Guardar Perfil"}
+        {saving ? "Guardando..." : "Guardar Cambios"}
       </button>
     </div>
   );

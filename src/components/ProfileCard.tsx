@@ -67,12 +67,12 @@ export default function ProfileCard({ petId }: { petId: string }) {
           <span className="text-white">{calculateAge(profile.birthDate)}</span>
         </div>
         <div className="flex justify-between border-b border-gray-700 pb-2">
-          <span className="font-semibold text-gray-300">Especie:</span>
-          <span className="text-white">{profile.specie || "No especificada"}</span>
-        </div>
-        <div className="flex justify-between border-b border-gray-700 pb-2">
           <span className="font-semibold text-gray-300">Peso:</span>
           <span className="text-white">{profile.weight || "No registrado"} kg</span>
+        </div>
+        <div className="flex justify-between border-b border-gray-700 pb-2">
+          <span className="font-semibold text-gray-300">Especie:</span>
+          <span className="text-white">{profile.specie || "No especificada"}</span>
         </div>
         <div className="flex justify-between border-b border-gray-700 pb-2">
           <span className="font-semibold text-gray-300">Raza:</span>
