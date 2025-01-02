@@ -4,6 +4,7 @@ import { useState } from "react";
 import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { Event } from "@/types/event";
 import { toast } from "react-toastify";
+import { createGoogleCalendarEventDto } from "@/dto/googleCalendarEventDto";
 
 const db = new FirestoreDatabase<Event>("events");
 
@@ -31,7 +32,7 @@ export default function EventForm({
     if (!date || !daysInterval) return undefined;
     const initialDate = new Date(date);
     initialDate.setDate(initialDate.getDate() + daysInterval);
-    return initialDate.toISOString().split("T")[0]; // Retorna en formato "YYYY-MM-DD"
+    return initialDate.toISOString();
   };
 
   const handleSave = async () => {
@@ -39,18 +40,17 @@ export default function EventForm({
       toast.error("No se puede guardar el evento sin una mascota seleccionada.");
       return;
     }
-
+  
     const { title, date, description, daysInterval } = eventData;
-
     if (!title || !date) {
       toast.error("Los campos 'Título' y 'Fecha' son obligatorios.");
       return;
     }
-
+  
     setSaving(true);
     try {
       const finalDate = calculateFinalDate(date, daysInterval);
-
+  
       const eventToAdd: Omit<Event, "id"> = {
         petId,
         title,
@@ -59,17 +59,81 @@ export default function EventForm({
         daysInterval: daysInterval || 0,
         finalDate: finalDate || "",
       };
-
+  
+      // Guardar en Firebase
       await db.add(eventToAdd);
-      toast.success("Evento guardado correctamente.");
-      await onSuccess();
+  
+      // Obtener el token de acceso
+      const tokenResponse = await fetch("/api/google/get-token");
+      if (!tokenResponse.ok) {
+        const error = await tokenResponse.json();
+        console.error("Error fetching access token:", error); // Log de error si el token no se obtiene
+        throw new Error(error.error || "Failed to retrieve access token");
+      }
+      
+      const { access_token: accessToken } = await tokenResponse.json();
+      console.log("Access Token fetched:", accessToken); 
+  
+      // Crear DTO para Google Calendar
+      const startDate = new Date(date);
+      const endDate = daysInterval
+        ? new Date(startDate.getTime() + daysInterval * 24 * 60 * 60 * 1000)
+        : startDate;
+  
+      const isAllDayEvent = true;
+      const calendarEvent = createGoogleCalendarEventDto(
+        title,
+        description,
+        startDate,
+        endDate,
+        isAllDayEvent
+      );
+      console.log("Validating fields - Title:", title, "Date:", date); // Log antes de validar
+      if (!title || !date) {
+        console.error("Missing required fields in EventForm:", { title, date }); // Log si faltan campos
+        toast.error("Los campos 'Título' y 'Fecha' son obligatorios.");
+        return;
+      }
+      console.log("Payload being sent to /api/google/add-event:", {
+        accessToken,
+        title,
+        date,
+        daysInterval,
+        description,
+      });// Log del DTO creado
+
+      // Enviar a la API de Google Calendar
+      const calendarResponse = await fetch("/api/google/add-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accessToken,
+          title,
+          date,
+          daysInterval,
+          description,
+        }),
+      });
+  
+      if (!calendarResponse.ok) {
+        const error = await calendarResponse.json();
+        console.error("Google Calendar API Error:", error);
+        toast.error(`Error al sincronizar con Google Calendar: ${error.error.message}`);
+        return;
+      } else {
+        const createdEvent = await calendarResponse.json();
+        window.open(createdEvent.htmlLink, "_blank"); 
+        toast.success("Evento sincronizado con Google Calendar.");
+      }
+        await onSuccess();
     } catch (error) {
-      console.error("Error al guardar el evento:", error);
-      toast.error("Error al guardar el evento.");
+      console.error("Unexpected error while saving event:", error);
+      toast.error("Error inesperado al guardar el evento.");
     } finally {
       setSaving(false);
     }
   };
+  
 
   return (
     <div className="space-y-4">

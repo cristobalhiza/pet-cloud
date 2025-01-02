@@ -9,6 +9,7 @@ import ProfileForm from "@/components/ProfileForm";
 import { Pet } from "@/types/pet";
 import { FiPlus } from "react-icons/fi";
 import { usePetContext } from "@/context/PetContext";
+import { useRef } from "react";
 
 const db = new FirestoreDatabase<Pet>("pet");
 
@@ -16,6 +17,7 @@ export default function Home() {
   const [pets, setPets] = useState<Pet[]>([]);
   const { petId, setPetId } = usePetContext();
   const [showModal, setShowModal] = useState(false);
+  const addingRef = useRef(false);
 
   useEffect(() => {
     const fetchPets = async () => {
@@ -29,20 +31,28 @@ export default function Home() {
         console.error("Error al obtener mascotas:", error);
       }
     };
+
     fetchPets();
-  }, [petId, setPetId]);
+  }, []);
 
   const handleAddPet = async (newPet: Partial<Pet>) => {
+    if (addingRef.current) return;
+    addingRef.current = true;
+
     try {
-      await db.add(newPet as Omit<Pet, "id">);
+      console.log("Agregando mascota:", newPet);
+      const newId = await db.add(newPet as Omit<Pet, "id">);
+      console.log("Nueva mascota creada con ID:", newId);
       const updatedPets = await db.getAll();
       setPets(updatedPets);
-      setPetId(updatedPets[updatedPets.length - 1].id);
-      setShowModal(false); // Cerrar el modal después de guardar
+      setPetId(newId);
+      setShowModal(false);
       toast.success("Mascota agregada correctamente");
     } catch (error) {
       console.error("Error al agregar mascota:", error);
       toast.error("Error al agregar mascota");
+    } finally {
+      addingRef.current = false;
     }
   };
 

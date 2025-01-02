@@ -4,7 +4,6 @@ import { useState } from "react";
 import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { Pet } from "@/types/pet";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const db = new FirestoreDatabase<Pet>("pet");
 
@@ -13,7 +12,7 @@ export default function ProfileForm({
   onSuccess,
 }: {
   initialData: Partial<Pet> | null;
-  onSuccess: (newPet: Partial<Pet>) => Promise<void>;
+  onSuccess: (updatedPet: Partial<Pet>) => Promise<void>;
 }) {
   const [profile, setProfile] = useState<Partial<Pet>>(initialData || {});
   const [saving, setSaving] = useState(false);
@@ -31,38 +30,17 @@ export default function ProfileForm({
   };
 
   const handleSave = async () => {
+    if (!profile.name || !profile.birthDate || !profile.specie) {
+      toast.error("Por favor, completa todos los campos obligatorios.");
+      return;
+    }
+
     setSaving(true);
     try {
-      const { name, birthDate, specie } = profile;
-      const missingFields: string[] = [];
-
-      if (!name) missingFields.push("Nombre");
-      if (!birthDate) missingFields.push("Fecha de nacimiento");
-      if (!specie) missingFields.push("Especie");
-
-      if (missingFields.length > 0) {
-        toast.error(
-          `Completa los campos obligatorios: ${missingFields.join(", ")}`
-        );
-        setSaving(false);
-        return;
-      }
-
-      const petData: Omit<Pet, "id"> = {
-        name: profile.name || "",
-        birthDate: profile.birthDate || "",
-        specie: profile.specie || "",
-        weight: profile.weight || 0,
-        breed: profile.breed || "",
-        description: profile.description || "",
-        photo: profile.photo || "",
-      };
-
-      await onSuccess(petData); 
-      toast.success("Perfil validado correctamente.");
+      await onSuccess(profile); // Delegar completamente el manejo de éxito
     } catch (error) {
-      console.error("Error al guardar el perfil:", error);
-      toast.error("Error al guardar el perfil.");
+      console.error("Error al guardar mascota:", error);
+      toast.error("Ocurrió un error al guardar la mascota.");
     } finally {
       setSaving(false);
     }
@@ -146,3 +124,4 @@ export default function ProfileForm({
     </div>
   );
 }
+
