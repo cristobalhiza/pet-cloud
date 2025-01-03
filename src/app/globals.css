@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Fondo oscuro siempre */
 body {
   @apply bg-dark text-lightGray;
 }

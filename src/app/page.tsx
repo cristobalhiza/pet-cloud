@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import EventList from "@/components/EventList";
 import ProfileCard from "@/components/ProfileCard";
-import EventForm from "@/components/EventForm"; // Importamos el formulario de eventos
+import EventForm from "@/components/EventForm";
 import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { toast } from "react-toastify";
 import ProfileForm from "@/components/ProfileForm";
@@ -12,60 +12,30 @@ import { usePetContext } from "@/context/PetContext";
 import { useRef } from "react";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
 import { useFetchEvents } from "@/hooks/useFetchEvents";
+import { useFetchPets } from "@/hooks/useFetchPets";
+import { useFetchProfile } from "@/hooks/useFetchProfile";
 
 const db = new FirestoreDatabase<Pet>("pet");
 
 export default function Home() {
   const { petId, setPetId } = usePetContext();
-  const { events, loading, refetch } = useFetchEvents(petId || ""); 
-  const [pets, setPets] = useState<Pet[]>([]);
-  const [profile, setProfile] = useState<Pet | null>(null);
-  const [showAddEvent, setShowAddEvent] = useState(false); 
+  const { pets, refetchPets } = useFetchPets(setPetId);
+  const { events, refetch } = useFetchEvents(petId || "");
+  const { profile } = useFetchProfile(petId);
+  const [showAddEvent, setShowAddEvent] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const addingRef = useRef(false);
-
-  useEffect(() => {
-    const fetchPets = async () => {
-      try {
-        const data = await db.getAll();
-        setPets(data);
-        if (data.length > 0 && !petId) {
-          setPetId(data[0].id);
-        }
-      } catch (error) {
-        console.error("Error al obtener mascotas:", error);
-      }
-    };
-
-    fetchPets();
-  }, [petId]);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (!petId) {
-        setProfile(null);
-        return;
-      }
-      try {
-        const data = await db.getOne(petId);
-        setProfile(data);
-      } catch (error) {
-        console.error("Error al cargar el perfil de la mascota:", error);
-      }
-    };
-
-    fetchProfile();
-  }, [petId]);
 
   const handleAddPet = async (newPet: Partial<Pet>) => {
     if (addingRef.current) return;
     addingRef.current = true;
 
     try {
-      const newId = await db.add(newPet as Omit<Pet, "id">);
-      const updatedPets = await db.getAll();
-      setPets(updatedPets);
-      setPetId(newId);
+      const newPetId = await db.add(newPet as Omit<Pet, "id">);
+
+      await refetchPets();
+      setPetId(newPetId);
+
       setShowModal(false);
       toast.success("Mascota agregada correctamente");
     } catch (error) {
@@ -75,18 +45,25 @@ export default function Home() {
     }
   };
 
+
   const handleDeletePet = async () => {
     if (!petId) return;
     try {
       await db.delete(petId);
-      const updatedPets = await db.getAll();
-      setPets(updatedPets);
-      setPetId(updatedPets[0]?.id || null);
+      await refetchPets();
+      if (pets.length > 1) {
+        const nextPet = pets.find((pet) => pet.id !== petId);
+        setPetId(nextPet ? nextPet.id : null);
+      } else {
+        setPetId(null);
+      }
+
       toast.success("Mascota eliminada correctamente");
     } catch (error) {
       toast.error("Error al eliminar mascota");
     }
   };
+
 
   const handleEventAdded = async () => {
     await refetch();
@@ -96,8 +73,8 @@ export default function Home() {
   return (
     <div className="p-4 sm:p-6 min-h-screen bg-dark text-lightGray">
       <div className="mb-6 w-full flex flex-col sm:flex-row sm:items-center">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-orange text-center sm:text-left sm:flex-1 my-2 sm:my-0">
-        My Pet Cloud 🐾
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-orange text-center sm:text-center sm:flex-1 my-2 sm:my-0">
+          Pet Cloud 🐾
         </h1>
         <div className="mt-4 sm:mt-0 flex flex-col">
           <h2 className="text-lg sm:text-xl font-semibold text-lightGray mb-2 sm:mb-4">

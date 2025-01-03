@@ -3,7 +3,6 @@ import { create } from "zustand";
 import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { Event } from "@/types/event";
 
-// Instancia FirestoreDatabase con la colección 'events'
 const db = new FirestoreDatabase<Event>("events");
 
 interface EventState {
@@ -23,5 +22,4 @@ export const useEventStore = create<EventState>((set) => ({
   },
 }));
 
-// Llamada inicial
 useEventStore.getState().fetchEvents();

@@ -15,11 +15,9 @@ export async function GET(req: NextRequest) {
   try {
     const tokens = await getAccessToken(code);
 
-    // Crear la URL de redirección absoluta
-    const redirectUrl = new URL(req.nextUrl.origin); // El origen actual del host
-    redirectUrl.pathname = "/"; // Redirige a la página principal
+    const redirectUrl = new URL(req.nextUrl.origin); 
+    redirectUrl.pathname = "/"; 
 
-    // Configurar cookies HTTPOnly con tokens
     const response = NextResponse.redirect(redirectUrl.toString());
     if (tokens.access_token) {
       console.log("Access Token set in cookie:", tokens.access_token); 
@@ -41,7 +39,6 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Error fetching tokens:", error);
 
-    // Redirige a una página de error con una URL absoluta
     const errorUrl = new URL(req.nextUrl.origin);
     errorUrl.pathname = "/";
     errorUrl.searchParams.set("error", "auth_failed");

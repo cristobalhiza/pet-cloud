@@ -4,7 +4,6 @@ import { useState } from "react";
 import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { Event } from "@/types/event";
 import { toast } from "react-toastify";
-import { createGoogleCalendarEventDto } from "@/dto/googleCalendarEventDto";
 import { useFetchEvents } from "@/hooks/useFetchEvents";
 
 const db = new FirestoreDatabase<Event>("events");
@@ -20,7 +19,7 @@ export default function EventForm({
 }) {
   const [eventData, setEventData] = useState<Partial<Event>>(initialData || {});
   const [saving, setSaving] = useState(false);
-  const { events, loading, refetch } = useFetchEvents(petId);
+  const { refetch } = useFetchEvents(petId);
   
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -63,41 +62,21 @@ export default function EventForm({
         finalDate: finalDate || "",
       };
   
-      // Guardar en Firebase
-      await db.add(eventToAdd);
-      await refetch();
-      // Si no hay `finalDate`, no sincronizamos con Google Calendar
+      await refetch(eventToAdd); 
       if (!finalDate) {
         toast.info("Evento guardado localmente. No se requiere sincronización con Google Calendar.");
-        await onSuccess(); // Refresca la interfaz
+        await onSuccess();
         return;
       }
   
-      // Obtener el token de acceso
       const tokenResponse = await fetch("/api/google/get-token");
       if (!tokenResponse.ok) {
         const error = await tokenResponse.json();
-        console.error("Error fetching access token:", error);
         throw new Error(error.error || "Failed to retrieve access token");
       }
   
       const { access_token: accessToken } = await tokenResponse.json();
-      console.log("Access Token fetched:", accessToken);
   
-      // Crear DTO para Google Calendar
-      const startDate = new Date(date);
-      const endDate = new Date(finalDate);
-  
-      const isAllDayEvent = true;
-      const calendarEvent = createGoogleCalendarEventDto(
-        title,
-        description,
-        startDate,
-        endDate,
-        isAllDayEvent
-      );
-  
-      // Enviar a la API de Google Calendar
       const calendarResponse = await fetch("/api/google/add-event", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -112,7 +91,6 @@ export default function EventForm({
   
       if (!calendarResponse.ok) {
         const error = await calendarResponse.json();
-        console.error("Google Calendar API Error:", error);
         toast.error(`Error al sincronizar con Google Calendar: ${error.error.message}`);
         return;
       } else {

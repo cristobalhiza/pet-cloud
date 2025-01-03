@@ -1,11 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { Pet } from "@/types/pet";
 import { toast } from "react-toastify";
-
-const db = new FirestoreDatabase<Pet>("pet");
 
 export default function ProfileForm({
   initialData,

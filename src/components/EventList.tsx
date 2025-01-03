@@ -1,4 +1,3 @@
-// src/components/EventList.tsx
 "use client";
 
 import { useState } from "react";
@@ -30,7 +29,7 @@ export default function EventList({ events, onDelete }: EventListProps) {
     try {
       await db.delete(id);
       toast.success("Evento eliminado correctamente");
-      await onDelete(); // Llama a onDelete para actualizar los datos
+      await onDelete();
     } catch (error) {
       console.error("Error al eliminar el evento:", error);
       toast.error("Error al eliminar el evento");

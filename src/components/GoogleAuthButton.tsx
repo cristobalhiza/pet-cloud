@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
@@ -7,7 +8,6 @@ export default function GoogleAuthButton() {
   const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Verificar autenticación y obtener información del usuario
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -16,7 +16,7 @@ export default function GoogleAuthButton() {
           const userInfo = await response.json();
           setUser(userInfo);
         } else {
-          setUser(null); // Usuario no autenticado
+          setUser(null);
         }
       } catch (error) {
         console.error("Error fetching user info:", error);
@@ -27,7 +27,6 @@ export default function GoogleAuthButton() {
     fetchUserInfo();
   }, []);
 
-  // Manejar autenticación
   const handleAuthClick = async () => {
     setLoading(true);
     try {
@@ -38,7 +37,7 @@ export default function GoogleAuthButton() {
 
       const { authUrl } = await response.json();
       if (authUrl) {
-        window.location.href = authUrl; // Redirigir al flujo de autenticación de Google
+        window.location.href = authUrl;
       } else {
         throw new Error("URL de autenticación no disponible.");
       }
@@ -50,7 +49,6 @@ export default function GoogleAuthButton() {
     }
   };
 
-  // Manejar logout
   const handleLogout = async () => {
     setLoading(true);
     try {
@@ -58,7 +56,7 @@ export default function GoogleAuthButton() {
 
       if (response.ok) {
         document.cookie = "access_token=; Max-Age=0; path=/;";
-        setUser(null); // Reinicia el estado del usuario
+        setUser(null);
         toast.success("Sesión cerrada correctamente.");
       } else {
         throw new Error("Error al cerrar sesión.");
@@ -77,10 +75,11 @@ export default function GoogleAuthButton() {
         disabled
         className="flex items-center gap-2 px-4 py-2 rounded bg-gray-500 text-white opacity-50 cursor-not-allowed"
       >
-        <img
+        <Image
           src="/google-icon.svg"
           alt="Google Icon"
-          className="w-5 h-5"
+          width={20}
+          height={20} 
         />
         Cargando...
       </button>
@@ -88,18 +87,18 @@ export default function GoogleAuthButton() {
   }
 
   if (user) {
-    // Mostrar mensaje de bienvenida y botón de logout
     return (
       <div className="flex items-center gap-4">
-        <span className="text-gray-800">Bienvenido, {user.name || user.email}!</span>
+        <span className="text-lightGray">Bienvenido, {user.name || user.email}!</span>
         <button
           onClick={handleLogout}
           className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 transition"
         >
-          <img
+          <Image
             src="/google-icon.svg"
             alt="Google Icon"
-            className="w-5 h-5"
+            width={20}
+            height={20} 
           />
           Logout
         </button>
@@ -107,16 +106,16 @@ export default function GoogleAuthButton() {
     );
   }
 
-  // Mostrar botón de login si no hay usuario autenticado
   return (
     <button
       onClick={handleAuthClick}
       className="flex items-center gap-2 px-4 py-2 bg-white text-gray-800 border border-gray-300 rounded shadow-md hover:bg-gray-100 transition"
     >
-      <img
+      <Image
         src="/google-icon.svg"
         alt="Google Icon"
-        className="w-5 h-5"
+        width={20}
+        height={20} 
       />
       Autorizar con Google
     </button>
