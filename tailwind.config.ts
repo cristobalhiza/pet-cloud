@@ -1,16 +1,16 @@
-import type { Config } from 'tailwindcss';
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
-        darkBackground: "#1E1E2E",
-        darkCard: "#1E1E2E",
-        lightText: "#FFFFFF",
-        accentPurple: "#A78BFA",
-        accentPink: "#F472B6",
-        grayText: "#A1A1A1",
+        dark: "#242325", // Fondo oscuro principal
+        mediumGray: "#B3B3B3", // Color de las tarjetas
+        lightGray: "#C8C8C8", // Texto claro
+        beige: "#BBB891", // Color de acentos suaves
+        orange: "#DC965A", // Color de botones principales
+        accentPurple: "#DC965A", // Anillos o acentos adicionales
       },
     },
   },

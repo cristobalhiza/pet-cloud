@@ -1,11 +1,11 @@
+// src/components/EventList.tsx
 "use client";
 
 import { useState } from "react";
-import { useFetchEvents } from "@/hooks/useFetchEvents";
+import { Event } from "@/types/event";
 import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { toast } from "react-toastify";
 
-// Función para formatear fechas
 const formatDate = (dateString: string): string => {
   const options: Intl.DateTimeFormatOptions = {
     day: "2-digit",
@@ -15,33 +15,32 @@ const formatDate = (dateString: string): string => {
   return new Date(dateString).toLocaleDateString("es-ES", options);
 };
 
-export default function EventList({ petId }: { petId: string }) {
-  const { events, loading, refetch } = useFetchEvents(petId);
+interface EventListProps {
+  events: Event[];
+  onDelete: () => Promise<void>;
+}
+
+export default function EventList({ events, onDelete }: EventListProps) {
   const [sortBy, setSortBy] = useState<"date" | "finalDate" | "name">("date");
   const [order, setOrder] = useState<"asc" | "desc">("asc");
 
   const handleDelete = async (id: string) => {
-    const db = new FirestoreDatabase("events");
+    const db = new FirestoreDatabase<Event>("events");
 
     try {
       await db.delete(id);
       toast.success("Evento eliminado correctamente");
-      await refetch(); // Actualizar eventos tras eliminar
+      await onDelete(); // Llama a onDelete para actualizar los datos
     } catch (error) {
       console.error("Error al eliminar el evento:", error);
       toast.error("Error al eliminar el evento");
     }
   };
 
-  if (loading) {
-    return <p className="text-white">Cargando eventos...</p>;
-  }
-
   if (!events.length) {
-    return <p className="text-white">No hay eventos disponibles.</p>;
+    return <p className="text-dark text-2xl">No hay eventos disponibles.</p>;
   }
 
-  // Ordenar eventos según el criterio y el orden seleccionado
   const sortedEvents = [...events].sort((a, b) => {
     const getTimeOrMax = (date: string | undefined): number =>
       date ? new Date(date).getTime() : Number.MAX_SAFE_INTEGER;
@@ -71,14 +70,14 @@ export default function EventList({ petId }: { petId: string }) {
     <div>
       {/* Filtros */}
       <div className="mb-4 flex flex-wrap items-center gap-4">
-        <div className="flex flex-row">
-          <label className="text-white mr-2">Ordenar por:</label>
+        <div className="flex flex-row sm:text-lg">
+          <label className="text-dark mr-2">Ordenar por:</label>
           <select
             value={sortBy}
             onChange={(e) =>
               setSortBy(e.target.value as "date" | "finalDate" | "name")
             }
-            className="p-2 rounded bg-gray-800 text-white border border-gray-700"
+            className="p-2 rounded bg-dark text-white border border-mediumGray"
           >
             <option value="date">Fecha Inicial</option>
             <option value="finalDate">Fecha Final</option>
@@ -86,12 +85,12 @@ export default function EventList({ petId }: { petId: string }) {
           </select>
         </div>
 
-        <div className="flex flex-row">
-          <label className="text-white mr-2">Orden:</label>
+        <div className="flex flex-row sm:text-lg">
+          <label className="text-dark mr-2">Orden:</label>
           <select
             value={order}
             onChange={(e) => setOrder(e.target.value as "asc" | "desc")}
-            className="p-2 rounded bg-gray-800 text-white border border-gray-700"
+            className="p-2 rounded bg-dark text-white border border-mediumGray "
           >
             <option value="asc">Ascendente</option>
             <option value="desc">Descendente</option>
@@ -100,11 +99,11 @@ export default function EventList({ petId }: { petId: string }) {
       </div>
 
       {/* Lista de eventos */}
-      <div className="h-[558px] overflow-y-scroll bg-gray-900 p-4 rounded-lg">
+      <div className="h-[558px] overflow-y-scroll bg-mediumGray p-4 rounded-lg">
         {sortedEvents.map((event) => (
           <div
             key={event.id}
-            className="flex justify-between items-center p-4 mb-2 bg-gray-800 text-white rounded"
+            className="flex justify-between items-center p-4 mb-2 bg-beige text-dark rounded sm:text-lg"
           >
             <div>
               <p>

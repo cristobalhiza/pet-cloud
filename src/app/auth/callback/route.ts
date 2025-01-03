@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
     // Configurar cookies HTTPOnly con tokens
     const response = NextResponse.redirect(redirectUrl.toString());
     if (tokens.access_token) {
+      console.log("Access Token set in cookie:", tokens.access_token); 
       response.cookies.set("access_token", tokens.access_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",

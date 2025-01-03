@@ -1,6 +1,10 @@
 import { google } from "googleapis";
 
-const SCOPES = ["https://www.googleapis.com/auth/calendar"];
+const SCOPES = [
+  "https://www.googleapis.com/auth/calendar",
+  "https://www.googleapis.com/auth/userinfo.email",
+  "https://www.googleapis.com/auth/userinfo.profile",
+];
 
 export const getOAuth2Client = () => {
   const clientId = process.env.NEXT_PUBLIC_CLIENT_ID!;

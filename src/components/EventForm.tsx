@@ -5,6 +5,7 @@ import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { Event } from "@/types/event";
 import { toast } from "react-toastify";
 import { createGoogleCalendarEventDto } from "@/dto/googleCalendarEventDto";
+import { useFetchEvents } from "@/hooks/useFetchEvents";
 
 const db = new FirestoreDatabase<Event>("events");
 
@@ -19,6 +20,8 @@ export default function EventForm({
 }) {
   const [eventData, setEventData] = useState<Partial<Event>>(initialData || {});
   const [saving, setSaving] = useState(false);
+  const { events, loading, refetch } = useFetchEvents(petId);
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -62,23 +65,28 @@ export default function EventForm({
   
       // Guardar en Firebase
       await db.add(eventToAdd);
+      await refetch();
+      // Si no hay `finalDate`, no sincronizamos con Google Calendar
+      if (!finalDate) {
+        toast.info("Evento guardado localmente. No se requiere sincronización con Google Calendar.");
+        await onSuccess(); // Refresca la interfaz
+        return;
+      }
   
       // Obtener el token de acceso
       const tokenResponse = await fetch("/api/google/get-token");
       if (!tokenResponse.ok) {
         const error = await tokenResponse.json();
-        console.error("Error fetching access token:", error); // Log de error si el token no se obtiene
+        console.error("Error fetching access token:", error);
         throw new Error(error.error || "Failed to retrieve access token");
       }
-      
+  
       const { access_token: accessToken } = await tokenResponse.json();
-      console.log("Access Token fetched:", accessToken); 
+      console.log("Access Token fetched:", accessToken);
   
       // Crear DTO para Google Calendar
       const startDate = new Date(date);
-      const endDate = daysInterval
-        ? new Date(startDate.getTime() + daysInterval * 24 * 60 * 60 * 1000)
-        : startDate;
+      const endDate = new Date(finalDate);
   
       const isAllDayEvent = true;
       const calendarEvent = createGoogleCalendarEventDto(
@@ -88,20 +96,7 @@ export default function EventForm({
         endDate,
         isAllDayEvent
       );
-      console.log("Validating fields - Title:", title, "Date:", date); // Log antes de validar
-      if (!title || !date) {
-        console.error("Missing required fields in EventForm:", { title, date }); // Log si faltan campos
-        toast.error("Los campos 'Título' y 'Fecha' son obligatorios.");
-        return;
-      }
-      console.log("Payload being sent to /api/google/add-event:", {
-        accessToken,
-        title,
-        date,
-        daysInterval,
-        description,
-      });// Log del DTO creado
-
+  
       // Enviar a la API de Google Calendar
       const calendarResponse = await fetch("/api/google/add-event", {
         method: "POST",
@@ -122,10 +117,12 @@ export default function EventForm({
         return;
       } else {
         const createdEvent = await calendarResponse.json();
-        window.open(createdEvent.htmlLink, "_blank"); 
+        await refetch();
+        window.open(createdEvent.htmlLink, "_blank");
         toast.success("Evento sincronizado con Google Calendar.");
       }
-        await onSuccess();
+      
+      await onSuccess();
     } catch (error) {
       console.error("Unexpected error while saving event:", error);
       toast.error("Error inesperado al guardar el evento.");
@@ -136,21 +133,21 @@ export default function EventForm({
   
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-dark">
       <input
         type="text"
         name="title"
         placeholder="Título del Evento"
         value={eventData.title || ""}
         onChange={handleChange}
-        className="w-full p-3 border rounded-lg bg-gray-700 text-white placeholder-gray-400"
+        className="w-full p-3 border rounded-lg bg-lightGray placeholder-dark"
       />
       <input
         type="date"
         name="date"
         value={eventData.date || ""}
         onChange={handleChange}
-        className="w-full p-3 border rounded-lg bg-gray-700 text-white placeholder-gray-400"
+        className="w-full p-3 border rounded-lg bg-lightGray placeholder-dark"
       />
       <input
         type="number"
@@ -158,23 +155,23 @@ export default function EventForm({
         placeholder="Días de Duración"
         value={eventData.daysInterval || ""}
         onChange={handleChange}
-        className="w-full p-3 border rounded-lg bg-gray-700 text-white placeholder-gray-400"
+        className="w-full p-3 border rounded-lg bg-lightGray placeholder-dark"
       />
       <textarea
         name="description"
         placeholder="Descripción"
         value={eventData.description || ""}
         onChange={handleChange}
-        className="w-full p-3 border rounded-lg bg-gray-700 text-white placeholder-gray-400 resize-none"
+        className="w-full p-3 border rounded-lg bg-lightGray placeholder-dark resize-none"
         rows={4}
       />
       <button
         onClick={handleSave}
         disabled={saving}
-        className={`w-full p-3 rounded-lg text-white font-semibold transition ${
+        className={`w-full p-3 rounded-lg text-dark font-semibold transition ${
           saving
             ? "bg-gray-500 cursor-not-allowed"
-            : "bg-accentPurple hover:bg-purple-700"
+            : "bg-accentPurple hover:bg-lightGray"
         }`}
       >
         {saving ? "Guardando..." : "Guardar Evento"}

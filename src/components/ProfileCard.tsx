@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { Pet } from "@/types/pet";
 import ProfileForm from "./ProfileForm";
+import { toast } from "react-toastify";
 
 const db = new FirestoreDatabase<Pet>("pet");
 
@@ -37,64 +38,77 @@ export default function ProfileCard({ petId }: { petId: string }) {
     return `${years} años y ${adjustedMonths} meses`;
   };
 
+  const handleUpdateProfile = async (updatedPet: Partial<Pet>) => {
+    if (!petId) {
+      toast.error("No se encontró el ID de la mascota.");
+      return;
+    }
+  
+    try {
+      await db.update(petId, updatedPet); // Actualizar en Firebase
+      await fetchProfile(); // Refrescar datos después de actualizar
+      toast.success("Perfil actualizado correctamente");
+      setEditing(false); // Salir del modo edición
+    } catch (error) {
+      toast.error("No se pudo actualizar el perfil.");
+    }
+  };
+
   // Renderizado del componente
   return editing ? (
-    <ProfileForm
-      initialData={profile}
-      onSuccess={async () => {
-        setEditing(false);
-        await fetchProfile(); // Refrescar datos del perfil
-      }}
-    />
+<ProfileForm
+  initialData={profile}
+  onSuccess={handleUpdateProfile}
+/>
+
   ) : (
-<div className="text-white p-6 bg-gray-800 rounded-lg shadow-md">
-  {profile ? (
-    <>
-      {profile.photo && (
-        <img
-          src={profile.photo}
-          alt={`Foto de ${profile.name}`}
-          className="w-52 h-52 mx-auto object-cover rounded-full mb-6 border-4 border-gray-700"
-        />
+    <div className="text-dark px-6 bg-transparent rounded-lg flex flex-col justify-between h-full">
+      {profile ? (
+        <>
+          {profile.photo && (
+            <img
+              src={profile.photo}
+              alt={`Foto de ${profile.name}`}
+              className="w-52 h-52 mx-auto object-cover rounded-full mb-6 border-4 border-gray-700"
+            />
+          )}
+          <div className="space-y-4 sm:text-lg">
+
+            <div className="flex justify-between border-b border-gray-700 pb-2">
+              <span className="font-semibold">Edad:</span>
+              <span className="">{calculateAge(profile.birthDate)}</span>
+            </div>
+            <div className="flex justify-between border-b border-gray-700 pb-2">
+              <span className="font-semibold ">Peso:</span>
+              <span className="">{profile.weight || "No registrado"} kg</span>
+            </div>
+            <div className="flex justify-between border-b border-gray-700 pb-2">
+              <span className="font-semibold ">Especie:</span>
+              <span className="">{profile.specie || "No especificada"}</span>
+            </div>
+            <div className="flex justify-between border-b border-gray-700 pb-2">
+              <span className="font-semibold ">Raza:</span>
+              <span className="">{profile.breed || "No registrada"}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-semibold ">Descripción:</span>
+              <span className=" text-right">
+                {profile.description || "Sin descripción"}
+              </span>
+            </div>
+          </div>
+          <div className="mt-6 flex justify-center">
+          <button
+            onClick={() => setEditing(true)}
+            className="mt-6 w-96 bg-accentPurple text-dark font-semibold mx-auto p-2 rounded-lg border-solid border-2 border-transparent hover:border-dark transition"
+          >
+            Editar Perfil
+          </button>
+          </div>
+        </>
+      ) : (
+        <p className="text-center text-orange">Cargando perfil...</p>
       )}
-      <div className="space-y-4">
-        <div className="flex justify-between border-b border-gray-700 pb-2">
-          <span className="font-semibold text-gray-300">Nombre:</span>
-          <span className="text-white">{profile.name}</span>
-        </div>
-        <div className="flex justify-between border-b border-gray-700 pb-2">
-          <span className="font-semibold text-gray-300">Edad:</span>
-          <span className="text-white">{calculateAge(profile.birthDate)}</span>
-        </div>
-        <div className="flex justify-between border-b border-gray-700 pb-2">
-          <span className="font-semibold text-gray-300">Peso:</span>
-          <span className="text-white">{profile.weight || "No registrado"} kg</span>
-        </div>
-        <div className="flex justify-between border-b border-gray-700 pb-2">
-          <span className="font-semibold text-gray-300">Especie:</span>
-          <span className="text-white">{profile.specie || "No especificada"}</span>
-        </div>
-        <div className="flex justify-between border-b border-gray-700 pb-2">
-          <span className="font-semibold text-gray-300">Raza:</span>
-          <span className="text-white">{profile.breed || "No registrada"}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="font-semibold text-gray-300">Descripción:</span>
-          <span className="text-white text-right">
-            {profile.description || "Sin descripción"}
-          </span>
-        </div>
-      </div>
-      <button
-        onClick={() => setEditing(true)}
-        className="mt-6 w-full bg-accentPurple text-white font-semibold p-2 rounded-lg hover:bg-purple-700 transition"
-      >
-        Editar Perfil
-      </button>
-    </>
-  ) : (
-    <p className="text-center text-gray-400">Cargando perfil...</p>
-  )}
-</div>
+    </div>
   );
 }
