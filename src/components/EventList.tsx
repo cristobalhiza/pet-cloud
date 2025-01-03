@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Event } from "@/types/event";
 import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { toast } from "react-toastify";
+import { CalendarIcon, TrashIcon } from '@primer/octicons-react';
 
 const formatDate = (dateString: string): string => {
   const options: Intl.DateTimeFormatOptions = {
@@ -40,6 +41,48 @@ export default function EventList({ events, onDelete }: EventListProps) {
     return <p className="text-dark text-2xl">No hay eventos disponibles.</p>;
   }
 
+  const handleSyncToGoogleCalendar = async (event: Event) => {
+    try {
+      const tokenResponse = await fetch("/api/google/get-token");
+      if (!tokenResponse.ok) {
+        const error = await tokenResponse.json();
+        throw new Error(error.error || "Failed to retrieve access token");
+      }
+
+      const { access_token: accessToken } = await tokenResponse.json();
+
+      const response = await fetch("/api/google/add-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accessToken,
+          title: event.title,
+          date: event.date,
+          daysInterval: event.daysInterval,
+          description: event.description,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Error al sincronizar con Google Calendar:", error);
+        toast.error(`Error al sincronizar con Google Calendar: ${error.error.message}`);
+        return;
+      }
+
+      const createdEvent = await response.json();
+      window.open(createdEvent.htmlLink, "_blank");
+      toast.success("Evento sincronizado con Google Calendar.");
+    } catch (error) {
+      console.error("Error al sincronizar el evento:", error);
+      toast.error("Error al sincronizar el evento con Google Calendar.");
+    }
+  };
+
+  if (!events.length) {
+    return <p className="text-dark text-2xl">No hay eventos disponibles.</p>;
+  }
+
   const sortedEvents = [...events].sort((a, b) => {
     const getTimeOrMax = (date: string | undefined): number =>
       date ? new Date(date).getTime() : Number.MAX_SAFE_INTEGER;
@@ -64,6 +107,8 @@ export default function EventList({ events, onDelete }: EventListProps) {
     }
     return 0;
   });
+
+  
 
   return (
     <div>
@@ -112,12 +157,20 @@ export default function EventList({ events, onDelete }: EventListProps) {
               {event.finalDate && <p>Fecha Final: {formatDate(event.finalDate)}</p>}
               {event.description && <p>Descripción: {event.description}</p>}
             </div>
-            <button
-              onClick={() => handleDelete(event.id!)}
-              className="bg-red-500 text-white p-2 rounded hover:bg-red-700"
-            >
-              🗑️
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleDelete(event.id!)}
+                className="bg-red-500 text-white p-2 rounded hover:bg-red-700"
+              >
+                <TrashIcon size={24} />
+              </button>
+              <button
+                onClick={() => handleSyncToGoogleCalendar(event)}
+                className="bg-blue-500 text-white p-2 rounded hover:bg-blue-700"
+              >
+                <CalendarIcon size={24} />
+              </button>
+            </div>
           </div>
         ))}
       </div>

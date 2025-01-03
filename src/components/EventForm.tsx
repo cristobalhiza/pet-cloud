@@ -39,17 +39,17 @@ export default function EventForm({
       toast.error("No se puede guardar el evento sin una mascota seleccionada.");
       return;
     }
-  
+
     const { title, date, description, daysInterval } = eventData;
     if (!title || !date) {
       toast.error("Los campos 'Título' y 'Fecha' son obligatorios.");
       return;
     }
-  
+
     setSaving(true);
     try {
       const finalDate = calculateFinalDate(date, daysInterval);
-  
+
       const eventToAdd: Omit<Event, "id"> = {
         petId,
         title,
@@ -58,45 +58,9 @@ export default function EventForm({
         daysInterval: daysInterval || 0,
         finalDate: finalDate || "",
       };
-  
-      await refetch(eventToAdd); 
-      if (!finalDate) {
-        toast.info("Evento guardado localmente. No se requiere sincronización con Google Calendar.");
-        await onSuccess();
-        return;
-      }
-  
-      const tokenResponse = await fetch("/api/google/get-token");
-      if (!tokenResponse.ok) {
-        const error = await tokenResponse.json();
-        throw new Error(error.error || "Failed to retrieve access token");
-      }
-  
-      const { access_token: accessToken } = await tokenResponse.json();
-  
-      const calendarResponse = await fetch("/api/google/add-event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          accessToken,
-          title,
-          date,
-          daysInterval,
-          description,
-        }),
-      });
-  
-      if (!calendarResponse.ok) {
-        const error = await calendarResponse.json();
-        toast.error(`Error al sincronizar con Google Calendar: ${error.error.message}`);
-        return;
-      } else {
-        const createdEvent = await calendarResponse.json();
-        await refetch();
-        window.open(createdEvent.htmlLink, "_blank");
-        toast.success("Evento sincronizado con Google Calendar.");
-      }
-      
+
+      await refetch(eventToAdd); // Guardar el evento localmente
+      toast.success("Evento guardado correctamente.");
       await onSuccess();
     } catch (error) {
       console.error("Unexpected error while saving event:", error);
