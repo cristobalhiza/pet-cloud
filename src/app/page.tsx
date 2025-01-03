@@ -97,7 +97,7 @@ export default function Home() {
     <div className="p-4 sm:p-6 min-h-screen bg-dark text-lightGray">
       <div className="mb-6 w-full flex flex-col sm:flex-row sm:items-center">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-orange text-center sm:text-left sm:flex-1 my-2 sm:my-0">
-          Rincón de Mascotas 🐾
+        My Pet Cloud 🐾
         </h1>
         <div className="mt-4 sm:mt-0 flex flex-col">
           <h2 className="text-lg sm:text-xl font-semibold text-lightGray mb-2 sm:mb-4">

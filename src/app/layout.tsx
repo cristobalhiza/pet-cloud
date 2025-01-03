@@ -4,9 +4,9 @@ import { ToastContainer } from "react-toastify";
 import { PetProvider } from "@/context/PetContext";
 
 export const metadata: Metadata = {
-  title: "Rincón de Kaisita",
+  title: "Pet Cloud | Pet Events Dashboard",
   description:
-    "Aplicación realizada por Cristobal Hiza para su querida perrita Kai",
+    "Pet Cloud Pet Events Dashboard Made By Cristobal Hiza Web Developer",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
