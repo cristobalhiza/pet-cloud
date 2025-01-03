@@ -9,7 +9,6 @@ export async function POST(req: NextRequest) {
         const { accessToken, title, date, daysInterval, description } = body;
 
         if (!accessToken || !title || !date) {
-            console.error("Missing required fields in request body:", { title, date, accessToken });
             return NextResponse.json(
                 { error: "Missing required fields: accessToken, title, or date" },
                 { status: 400 }

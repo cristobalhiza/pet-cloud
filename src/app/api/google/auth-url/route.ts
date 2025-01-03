@@ -6,8 +6,7 @@ export async function GET() {
       const authUrl = generateAuthUrl();
       if (!authUrl) throw new Error("No se pudo generar la URL de autenticación.");
       return NextResponse.json({ authUrl });
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: "Failed to generate auth URL" }, { status: 500 });
     }
   }
-  

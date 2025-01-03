@@ -26,7 +26,7 @@ export default function ProfileCard({ petId }: { petId: string }) {
       await refetch(updatedPet);
       toast.success("Perfil actualizado correctamente");
       setEditing(false);
-    } catch (error) {
+    } catch {
       toast.error("No se pudo actualizar el perfil.");
     }
   };

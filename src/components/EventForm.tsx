@@ -1,12 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { Event } from "@/types/event";
 import { toast } from "react-toastify";
 import { useFetchEvents } from "@/hooks/useFetchEvents";
-
-const db = new FirestoreDatabase<Event>("events");
 
 export default function EventForm({
   initialData,

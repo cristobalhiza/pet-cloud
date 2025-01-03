@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
 
         const userInfo = await response.json();
         return NextResponse.json(userInfo);
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: "Failed to fetch user info" }, { status: 500 });
     }
 }

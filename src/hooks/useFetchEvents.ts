@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import FirestoreDatabase from "@/services/repository/firestoreDatabase";
 import { Event } from "@/types/event";
 
@@ -8,7 +8,7 @@ export function useFetchEvents(petId: string | null) {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     setLoading(true);
     if (!petId) {
       setEvents([]);
@@ -23,7 +23,7 @@ export function useFetchEvents(petId: string | null) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [petId]);
 
   const refetch = async (newEvent?: Omit<Event, "id">) => {
     if (newEvent) {
@@ -34,7 +34,7 @@ export function useFetchEvents(petId: string | null) {
 
   useEffect(() => {
     fetchEvents();
-  }, [petId]);
+  }, [fetchEvents]);
 
   return { events, loading, refetch };
 }
