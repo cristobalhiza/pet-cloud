@@ -25,9 +25,13 @@ export function useFetchEvents(petId: string | null) {
     }
   }, [petId]);
 
-  const refetch = async (newEvent?: Omit<Event, "id">) => {
-    if (newEvent) {
-      await db.add(newEvent);
+  const refetch = async (event?: Partial<Event>) => {
+    if (event) {
+      if (event.id) {
+        await db.update(event.id, event);
+      } else {
+        await db.add(event as Omit<Event, "id">);
+      }
     }
     await fetchEvents();
   };

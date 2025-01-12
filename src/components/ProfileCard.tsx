@@ -52,7 +52,7 @@ export default function ProfileCard({ petId }: { petId: string }) {
               height={220} 
             />
           )}
-          <div className="space-y-4 sm:text-lg">
+          <div className="space-y-4 sm:text-base">
 
             <div className="flex justify-between border-b border-gray-700 pb-2">
               <span className="font-semibold">Edad:</span>

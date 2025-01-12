@@ -40,7 +40,7 @@ export default function EventForm({
       return;
     }
 
-    const { title, date, description, daysInterval } = eventData;
+    const {id, title, date, description, daysInterval } = eventData;
     if (!title || !date) {
       toast.error("Los campos 'Título' y 'Fecha' son obligatorios.");
       return;
@@ -50,7 +50,7 @@ export default function EventForm({
     try {
       const finalDate = calculateFinalDate(date, daysInterval);
 
-      const eventToAdd: Omit<Event, "id"> = {
+      const eventToSave: Omit<Event, "id"> = {
         petId,
         title,
         date,
@@ -59,8 +59,15 @@ export default function EventForm({
         finalDate: finalDate || "",
       };
 
-      await refetch(eventToAdd); // Guardar el evento localmente
-      toast.success("Evento guardado correctamente.");
+    
+      if (id) {
+        await refetch({ ...eventToSave, id });
+        toast.success("Evento actualizado correctamente.");
+      } else {
+        await refetch(eventToSave);
+        toast.success("Evento guardado correctamente.");
+      }
+  
       await onSuccess();
     } catch (error) {
       console.error("Unexpected error while saving event:", error);

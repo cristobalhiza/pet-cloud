@@ -74,9 +74,9 @@ export default function Home() {
   return (
     <div className="p-4 sm:p-6 min-h-screen bg-dark text-lightGray">
     <div className="mb-6 w-full flex flex-col sm:flex-row sm:justify-between sm:items-center">
-      {/* Sección del título y el ícono */}
+      {/* Title */}
       <div className="flex items-center justify-center flex-1 gap-4">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-orange">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange">
           Pet Cloud
         </h1>
         <Image
@@ -87,16 +87,16 @@ export default function Home() {
         />
       </div>
   
-      {/* Sección de Google Auth y selección de mascota */}
+      {/*  Google Auth and pet */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6 mt-4 sm:mt-0">
         <div className="flex flex-col">
-          <h2 className="text-lg sm:text-xl font-semibold text-lightGray mb-2 sm:mb-4">
+          <h2 className="sm:text-lg font-semibold text-lightGray mb-2 sm:mb-4">
             Sincronización con Google Calendar
           </h2>
           <GoogleAuthButton />
         </div>
         <div className="p-4 rounded-lg shadow-md">
-          <h2 className="text-lg sm:text-xl font-semibold text-lightGray mb-2 sm:mb-4">
+          <h2 className="sm:text-lg font-semibold text-lightGray mb-2 sm:mb-4">
             Selecciona una Mascota
           </h2>
           <select
@@ -113,14 +113,14 @@ export default function Home() {
           {petId && (
             <button
               onClick={handleDeletePet}
-              className="mt-2 sm:mt-4 mr-2 sm:mr-6 text-black bg-orange p-2 rounded hover:bg-beige transition"
+              className="mt-2 sm:mt-4 mr-2 sm:mr-6 text-black bg-orange p-2 rounded hover:bg-beige transition text-sm"
             >
               Eliminar Mascota
             </button>
           )}
           <button
             onClick={() => setShowModal(true)}
-            className="mt-2 sm:mt-0 sm:ml-2 text-black bg-orange p-2 rounded hover:bg-beige transition"
+            className="mt-2 sm:mt-0 sm:ml-2 text-black bg-orange p-2 rounded hover:bg-beige transition text-sm"
           >
             Agregar Mascota
           </button>
@@ -128,17 +128,16 @@ export default function Home() {
       </div>
     </div>
   
-    {/* Resto del código permanece igual */}
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
       <div className="bg-mediumGray p-4 sm:p-6 rounded shadow-lg flex flex-col justify-between h-full">
-        <h2 className="text-3xl sm:text-4xl mb-4 sm:mb-8 font-bold text-dark text-center">
+        <h2 className="text-2xl sm:text-3xl mb-4 sm:mb-8 font-bold text-dark text-center">
           {profile ? `${profile.name}` : "Cargando perfil..."}
         </h2>
         {petId && <ProfileCard petId={petId} />}
       </div>
   
       <div className="bg-mediumGray p-4 sm:p-6 rounded shadow-lg">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-dark">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-dark">
           Vacunas y Eventos
         </h2>
         {petId && <EventList events={events} onDelete={refetch} />}
@@ -153,7 +152,7 @@ export default function Home() {
       </div>
     </div>
   
-    {/* Modales */}
+    {/* Modals */}
     {showAddEvent && petId && (
       <div className="fixed inset-0 bg-dark bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-dark p-4 sm:p-6 rounded-lg shadow-lg max-w-lg w-full relative">
@@ -163,7 +162,7 @@ export default function Home() {
           >
             ✕
           </button>
-          <h2 className="text-xl sm:text-2xl font-bold text-orange text-center mb-4">
+          <h2 className="text-lg sm:text-xl font-bold text-orange text-center mb-4">
             Agregar Nuevo Evento
           </h2>
           <EventForm initialData={null} petId={petId} onSuccess={handleEventAdded} />
@@ -180,7 +179,7 @@ export default function Home() {
           >
             ✕
           </button>
-          <h2 className="text-xl sm:text-2xl font-bold text-dark mb-4 sm:m-6">
+          <h2 className="text-lg sm:text-xl font-bold text-dark mb-4 sm:m-6">
             Agregar Nueva Mascota
           </h2>
           <ProfileForm
@@ -191,6 +190,6 @@ export default function Home() {
       </div>
     )}
   </div>
-  
+
   );
 }
