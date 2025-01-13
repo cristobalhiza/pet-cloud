@@ -79,7 +79,7 @@ export default function EventForm({
   
 
   return (
-    <div className="space-y-4 text-dark">
+    <div className="space-y-4 text-dark bg-dark p-6 rounded-md">
       <input
         type="text"
         name="title"

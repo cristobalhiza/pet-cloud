@@ -107,9 +107,10 @@ export default function GoogleAuthButton() {
   }
 
   return (
+    <div className="">
     <button
       onClick={handleAuthClick}
-      className="flex items-center gap-2 px-4 py-2 bg-white text-gray-800 border border-gray-300 rounded shadow-md hover:bg-gray-100 transition"
+      className="flex items-center gap-2 px-4 py-2 bg-white text-gray-800 border border-gray-300 rounded shadow-md hover:bg-gray-100 transition max-w-60"
     >
       <Image
         src="/google-icon.svg"
@@ -119,5 +120,6 @@ export default function GoogleAuthButton() {
       />
       Autorizar con Google
     </button>
+    </div>
   );
 }

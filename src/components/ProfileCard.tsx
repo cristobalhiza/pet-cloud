@@ -6,6 +6,7 @@ import ProfileForm from "./ProfileForm";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import { useFetchProfile } from "@/hooks/useFetchProfile";
+import Modal from "./Modal";
 
 export default function ProfileCard({ petId }: { petId: string }) {
   const { profile, loading, refetch } = useFetchProfile(petId);
@@ -31,13 +32,7 @@ export default function ProfileCard({ petId }: { petId: string }) {
     }
   };
 
-  return editing ? (
-<ProfileForm
-  initialData={profile}
-  onSuccess={handleUpdateProfile}
-/>
-
-  ) : (
+  return (
     <div className="text-dark px-6 bg-transparent rounded-lg flex flex-col justify-between h-full">
       {loading ? (
         <p className="text-center text-orange">Cargando perfil...</p>
@@ -49,11 +44,10 @@ export default function ProfileCard({ petId }: { petId: string }) {
               alt={`Foto de ${profile.name}`}
               className="w-56 h-56 mx-auto object-cover rounded-full mb-6 border-4 border-gray-700"
               width={220}
-              height={220} 
+              height={220}
             />
           )}
-          <div className="space-y-4 sm:text-base">
-
+          <div className="space-y-4 sm:text-base bg-beige p-3 rounded-md">
             <div className="flex justify-between border-b border-gray-700 pb-2">
               <span className="font-semibold">Edad:</span>
               <span className="font-bold">{calculateAge(profile.birthDate)}</span>
@@ -78,16 +72,28 @@ export default function ProfileCard({ petId }: { petId: string }) {
             </div>
           </div>
           <div className="mt-6 flex justify-center">
-          <button
-            onClick={() => setEditing(true)}
-            className="mt-6 w-96 bg-accentPurple text-dark font-semibold mx-auto p-2 rounded-lg border-solid border-2 border-transparent hover:border-dark transition"
-          >
-            Editar Perfil
-          </button>
+            <button
+              onClick={() => setEditing(true)}
+              className="mt-6 w-96 bg-accentPurple text-dark font-semibold mx-auto p-2 rounded-lg border-solid border-2 border-transparent hover:border-dark transition"
+            >
+              Editar Perfil
+            </button>
           </div>
         </>
       ) : (
         <p className="text-center text-orange">Cargando perfil...</p>
+      )}
+
+      {editing && (
+        <Modal
+          onClose={() => setEditing(false)}
+          title="Editar Perfil"
+        >
+          <ProfileForm
+            initialData={profile}
+            onSuccess={handleUpdateProfile}
+          />
+        </Modal>
       )}
     </div>
   );
