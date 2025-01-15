@@ -95,10 +95,10 @@ export default function EventList({ events, onDelete }: EventListProps) {
 
   const sortedEvents = (() => {
     const today = new Date().getTime();
-  
+
     const getTimeOrMax = (date: string | undefined): number =>
       date ? new Date(date).getTime() : Number.MAX_SAFE_INTEGER;
-  
+
     if (sortBy === "date") {
       return [...events].sort((a, b) => {
         const timeA = new Date(a.date).getTime();
@@ -106,56 +106,56 @@ export default function EventList({ events, onDelete }: EventListProps) {
         return order === "asc" ? timeA - timeB : timeB - timeA;
       });
     }
-  
+
     if (sortBy === "finalDate") {
       const eventsWithFutureFinalDate = events.filter(
         (event) => new Date(event.finalDate || event.date).getTime() >= today
       );
-  
+
       const eventsWithPastFinalDate = events.filter(
         (event) => new Date(event.finalDate || event.date).getTime() < today
       );
-  
+
       eventsWithFutureFinalDate.sort((a, b) => {
         const timeA = getTimeOrMax(a.finalDate);
         const timeB = getTimeOrMax(b.finalDate);
         return order === "asc" ? timeA - timeB : timeB - timeA;
       });
-  
+
       eventsWithPastFinalDate.sort((a, b) => {
         const timeA = getTimeOrMax(a.finalDate);
         const timeB = getTimeOrMax(b.finalDate);
         return order === "asc" ? timeA - timeB : timeB - timeA;
       });
-  
+
       return [...eventsWithFutureFinalDate, ...eventsWithPastFinalDate];
     }
-  
+
     if (sortBy === "name") {
       return [...events].sort((a, b) =>
         order === "asc" ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
       );
     }
-  
+
     return events;
   })();
-  
-  
 
-  
+
+
+
 
   return (
     <div>
       {/* Filtros */}
-      <div className="mb-4 flex flex-wrap items-center gap-4">
-        <div className="flex flex-row sm:text-base">
-          <label className="text-dark mr-2">Ordenar por:</label>
+      <div className="w-full max-w-3xl mx-auto px-4 flex flex-col gap-4 md:flex-row md:gap-6">
+        <div className="flex items-center gap-2">
+          <label className="text-dark">Ordenar por:</label>
           <select
             value={sortBy}
             onChange={(e) =>
               setSortBy(e.target.value as "date" | "finalDate" | "name")
             }
-            className="p-2 rounded bg-dark text-white border border-mediumGray"
+            className="bg-transparent text-dark font-bold"
           >
             <option value="date">Fecha Inicial</option>
             <option value="finalDate">Fecha Final</option>
@@ -163,12 +163,12 @@ export default function EventList({ events, onDelete }: EventListProps) {
           </select>
         </div>
 
-        <div className="flex flex-row sm:text-base">
-          <label className="text-dark mr-2">Orden:</label>
+        <div className="flex items-center gap-2">
+          <label className="text-dark">Orden:</label>
           <select
             value={order}
             onChange={(e) => setOrder(e.target.value as "asc" | "desc")}
-            className="p-2 rounded bg-dark text-white border border-mediumGray"
+            className="bg-transparent text-dark font-bold"
           >
             <option value="asc">Ascendente</option>
             <option value="desc">Descendente</option>
@@ -177,44 +177,54 @@ export default function EventList({ events, onDelete }: EventListProps) {
       </div>
 
       {/* Lista de eventos */}
-      <div className="h-[558px] overflow-y-scroll bg-mediumGray p-4 rounded-lg">
-        {sortedEvents.map((event) => (
-          <div
-            key={event.id}
-            className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 mb-2 bg-beige text-dark rounded sm:text-base"
-          >
-            <div className="mb-4 sm:mb-0">
-              <p>
-                <strong>{event.title}</strong>
-              </p>
-              <p>Fecha Inicial: {formatDate(event.date)}</p>
-              {event.finalDate && <p>Fecha Final: {formatDate(event.finalDate)}</p>}
-              {event.description && <p>Descripción: {event.description}</p>}
+      <div className="w-full max-w-3xl mx-auto h-[558px] overflow-y-scroll bg-mediumGray px-4 pt-4 pb-4 rounded-lg">
+       {sortedEvents.map((event) => (
+        <div
+          key={event.id}
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 mb-2 bg-beige text-dark rounded sm:text-base"
+        >
+          <div className="mb-4 sm:mb-0 w-full">
+            <p className="font-bold">{event.title}</p>
+            <div className="flex justify-between">
+              <span>Fecha Inicial:</span>
+              <span>{formatDate(event.date)}</span>
             </div>
-            <div className="flex gap-4 justify-center items-center">
-              <button
-                onClick={() => handleSyncToGoogleCalendar(event)}
-                title="Agregar a Google Calendar"
-                className="bg-blue-500 text-white p-2 rounded hover:bg-blue-700"
-              >
-                <CalendarIcon size={18} />
-              </button>
-              <button
-                onClick={() => handleEdit(event)}
-                title="Editar"
-                className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-700"
-              >
-                <PencilIcon size={18} />
-              </button>
-              <button
-                onClick={() => handleDelete(event.id!)}
-                title="Eliminar"
-                className="bg-red-500 text-white p-2 rounded hover:bg-red-700"
-              >
-                <TrashIcon size={18} />
-              </button>
-            </div>
+            {event.finalDate && (
+              <div className="flex justify-between">
+                <span>Fecha Final:</span>
+                <span className="font-semibold">{formatDate(event.finalDate)}</span>
+              </div>
+            )}
+            {event.description && (
+              <div className="italic">
+                <p>{event.description}</p>
+              </div>
+            )}
           </div>
+          <div className="flex gap-4 justify-center items-center flex-1 md:ml-4">
+            <button
+              onClick={() => handleSyncToGoogleCalendar(event)}
+              title="Agregar a Google Calendar"
+              className="bg-blue-500 text-white p-2 rounded hover:bg-blue-700"
+            >
+              <CalendarIcon size={18} />
+            </button>
+            <button
+              onClick={() => handleEdit(event)}
+              title="Editar"
+              className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-700"
+            >
+              <PencilIcon size={18} />
+            </button>
+            <button
+              onClick={() => handleDelete(event.id!)}
+              title="Eliminar"
+              className="bg-red-500 text-white p-2 rounded hover:bg-red-700"
+            >
+              <TrashIcon size={18} />
+            </button>
+          </div>
+        </div>
         ))}
       </div>
 

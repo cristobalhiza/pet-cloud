@@ -76,7 +76,7 @@ export default function Home() {
     <div className="p-4 sm:p-6 min-h-screen bg-dark text-lightGray">
       <div className="mb-4 w-full flex flex-col md:flex-row md:justify-between items-center gap-4">
         <div className="flex flex-row items-center justify-center flex-1 gap-4 md:mr-5">
-          <h1 className="text-3xl md:text-4xl font-bold text-orange">
+          <h1 className="text-4xl font-bold text-orange">
             Pet Cloud
           </h1>
           <Image
